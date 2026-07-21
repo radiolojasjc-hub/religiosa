@@ -248,15 +248,27 @@
             'use strict';
 
             // ============================================================
-            // CONFIGURAÇÕES - RELIGIOSA (CORRIGIDO)
+            // PLAYLIST RELIGIOSA - EMBARCADA DIRETAMENTE
+            // ============================================================
+            const PLAYLIST_RELIGIOSA = [
+                {"id":1,"artist":"Aline Barros","title":"Ressuscita-me","genero":"RELIGIOSA","src":"Aline-Barros_Ressuscita-me.mp3"},
+                {"id":2,"artist":"Aline Barros","title":"Sonda-me Usa-me","genero":"RELIGIOSA","src":"Aline-Barros-Sonda-me-Usa-me.mp3"},
+                {"id":3,"artist":"Anderson Freire","title":"Raridade","genero":"RELIGIOSA","src":"Anderson-Freire_Raridade.mp3"},
+                {"id":4,"artist":"Davi Sacer","title":"Deus de Promessas","genero":"RELIGIOSA","src":"Davi-Sacer_Deus-de-Promessas.mp3"},
+                {"id":5,"artist":"Bruna Karla","title":"Cicatrizes","genero":"RELIGIOSA","src":"Bruna-Karla_Cicatrizes.m4a"},
+                {"id":6,"artist":"Juliany","title":"Ah Jesus","genero":"RELIGIOSA","src":"Juliany_ah-Jesus.m4a"},
+                {"id":7,"artist":"Maquinhoa","title":"Ele no Desite","genero":"RELIGIOSA","src":"Maquinhoa_ele-no-desite.m4a"},
+                {"id":8,"artist":"Maria Marçal","title":"Deixa","genero":"RELIGIOSA","src":"Maria-Marcal_Deixa.m4a"},
+                {"id":9,"artist":"Talles Roberto","title":"Eu Escolho Deus","genero":"RELIGIOSA","src":"Talles-Roberto_Eu-Escolho-Eu-Escolho-Deus.m4a"},
+                {"id":10,"artist":"Thiago Brado","title":"Ninguém Te Ama Como Eu","genero":"RELIGIOSA","src":"Thiago-Brado_Ningu-m-Te-Ama-Como-Eu.m4a"},
+                {"id":11,"artist":"Zion Thariel","title":"Vai","genero":"RELIGIOSA","src":"Zion-Thariel_Vai.m4a"}
+            ];
+
+            // ============================================================
+            // CONFIGURAÇÕES
             // ============================================================
             const GENERO = 'RELIGIOSA';
             const COR = '#aa55ff';
-            
-            // URL CORRETA DO JSON
-            const JSON_URL = 'https://raw.githubusercontent.com/radiolojasjc-hub/religiosa/refs/heads/main/religiosa.json';
-            
-            // URL BASE PARA OS ARQUIVOS DE ÁUDIO
             const BASE_AUDIO_URL = 'https://raw.githubusercontent.com/radiolojasjc-hub/religiosa/refs/heads/main/';
 
             let musicas = [];
@@ -269,7 +281,6 @@
             let historicoReproducao = [];
             let favorites = [];
             let fabOpen = false;
-            let sleepTimer = null;
             let hideControlsTimeout = null;
             let ultimoId = null;
             let carregandoMusica = false;
@@ -349,23 +360,24 @@
             }
 
             // ============================================================
-            // GERAR URL COMPLETA - CORRIGIDO
+            // GERAR URLs - TENTA VÁRIAS OPÇÕES
             // ============================================================
             function gerarUrlsAlternativas(musica) {
                 const urls = new Set();
                 const src = musica.src || '';
                 
-                // Se já for uma URL completa, adiciona
                 if (src && src.trim()) {
-                    if (src.startsWith('http://') || src.startsWith('https://')) {
-                        urls.add(src);
-                    } else {
-                        // Tenta construir a URL com a base correta
-                        const nomeLimpo = src.replace(/^\.\//, '').replace(/^\/+/, '');
-                        if (nomeLimpo) {
-                            urls.add(BASE_AUDIO_URL + nomeLimpo);
-                        }
+                    // URL direta no repositório religiosa
+                    const nomeLimpo = src.replace(/^\.\//, '').replace(/^\/+/, '');
+                    if (nomeLimpo) {
+                        urls.add(BASE_AUDIO_URL + nomeLimpo);
                     }
+                    
+                    // Tenta com URL codificada
+                    try {
+                        const encoded = encodeURIComponent(nomeLimpo);
+                        urls.add(BASE_AUDIO_URL + encoded);
+                    } catch(e) {}
                 }
                 
                 // Variações do nome do arquivo
@@ -404,7 +416,7 @@
                     }
                 });
                 
-                // Tenta também no repositório play12 como fallback
+                // Fallback: play12
                 const fallbackUrls = [
                     `https://raw.githubusercontent.com/radiolojasjc-hub/play12/refs/heads/main/${src}`,
                     `https://raw.githubusercontent.com/radiolojasjc-hub/play12/refs/heads/main/${src.replace(/\.[^.]+$/, '')}.mp3`,
@@ -479,40 +491,15 @@
             }
 
             // ============================================================
-            // CARREGAR PLAYLIST - CORRIGIDO
+            // INICIALIZAR PLAYLIST
             // ============================================================
-            async function carregarPlaylist() {
-                try {
-                    showLoading(true);
-                    console.log('🔄 Carregando religiosa.json de:', JSON_URL);
-                    const response = await fetch(JSON_URL);
-                    if (!response.ok) throw new Error(`Erro HTTP ${response.status}`);
-                    let data = await response.json();
-                    
-                    if (!Array.isArray(data)) {
-                        if (data.musicas && Array.isArray(data.musicas)) data = data.musicas;
-                        else if (data.data && Array.isArray(data.data)) data = data.data;
-                        else { 
-                            const vals = Object.values(data); 
-                            if (vals.length && Array.isArray(vals[0])) data = vals[0]; 
-                            else throw new Error('Formato inválido'); 
-                        }
-                    }
-                    
-                    musicas = data.filter(m => m.src && m.src.trim() && m.title && m.title.trim());
-                    musicas.forEach(m => { 
-                        m.id = m.id || `religiosa_${Math.random().toString(36).substr(2, 6)}`; 
-                        m.genero = GENERO; 
-                    });
-                    
-                    console.log(`✅ RELIGIOSA carregou ${musicas.length} músicas`);
-                    showLoading(false);
-                    return true;
-                } catch (error) {
-                    console.error('❌ Erro ao carregar:', error);
-                    showLoading(false);
-                    return false;
-                }
+            function inicializarPlaylist() {
+                musicas = PLAYLIST_RELIGIOSA.map(m => ({
+                    ...m,
+                    id: m.id || `religiosa_${Math.random().toString(36).substr(2, 6)}`,
+                    genero: GENERO
+                }));
+                console.log(`✅ RELIGIOSA carregou ${musicas.length} músicas da playlist embarcada`);
             }
 
             function obterProximaMusica() {
@@ -561,7 +548,7 @@
             }
 
             // ============================================================
-            // playMusic - CORRIGIDO
+            // playMusic
             // ============================================================
             async function playMusic() {
                 if (carregandoMusica) return;
@@ -853,13 +840,14 @@
                 }
             }
 
-            async function recarregarPlaylist() {
-                await carregarPlaylist();
+            function recarregarPlaylist() {
+                inicializarPlaylist();
                 currentPlaylist = shuffleArray([...musicas]);
                 currentIndex = 0;
                 ultimoId = null;
                 tentativasFalhas = 0;
                 if (isBackgroundActive) setTimeout(() => playMusic(), 200);
+                showNotification('🔄 Playlist recarregada!', 1500);
             }
 
             // ============================================================
@@ -871,11 +859,7 @@
                     updateFavCount();
                     renderFavList();
 
-                    const carregou = await carregarPlaylist();
-                    if (!carregou || musicas.length === 0) { 
-                        setTimeout(() => { location.reload(); }, 3000);
-                        return; 
-                    }
+                    inicializarPlaylist();
 
                     currentPlaylist = shuffleArray([...musicas]);
                     currentIndex = 0;
