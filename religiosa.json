@@ -12,6 +12,9 @@
 {"id":11,"artist":"Zion-Thariel","title":"Vai","genero":"RELIGIOSA","src":"Zion-Thariel_Vai.m4a"},
   {"id":12,"artist":"Leandro Borges","title":"Deus e Eu","genero":"POP","src":"DeuseEu_LeandroBorges.opus"},
 {"id":13,"artist":"Valesca Mayssa","title":"Eu Sou Teu Pai","genero":"POP","src":"EuSouTeuPai_ValescaMayssa.opus"},
-{"id":14,"artist":"Pr Andr Etzberger","title":"Ninguem explica Deus","genero":"POP","src":"NinguemexplicaDeus_PrAndrEtzberger.opus"}
+{"id":14,"artist":"Pr Andr Etzberger","title":"Ninguem explica Deus","genero":"POP","src":"NinguemexplicaDeus_PrAndrEtzberger.opus"},
+ {"id":14,"artist":"ChX vanessa da mata","title":"Foi Deus Quem Fez VC","genero":"POP","src":"FoiDeusQuemFezVC_ChXvanessadamata.mp3"},
+{"id":15,"artist":"William Sanfona Eliana Ribeiro","title":"ROMARIA","genero":"POP","src":"ROMARIA_WilliamSanfonaElianaRibeiro.mp3"},
+{"id":16,"artist":"William Sanfona Santana o Cantador","title":"UTOPIA","genero":"POP","src":"UTOPIA_WilliamSanfonaSantanaoCantador.mp3"} 
 ]
 
